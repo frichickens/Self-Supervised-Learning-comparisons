@@ -1,13 +1,15 @@
 # How to use this github?
 
+```
 .
-├── Checkpoints/        # Directory to save model checkpoints
-├── .env                # Private keys (HuggingFace, WandB)
-├── .gitignore          # Ignore large or unimportant files
+├── Checkpoints/        # Saved model checkpoints
+├── .env                # Private API keys (HuggingFace, WandB)
+├── .gitignore          # Ignored large/unimportant files
 ├── src/                # Main source code
-│   ├── model/          # Model architectures only
-│   ├── scripts/        # Scripts for reproducing results
-│   ├── utils/          # Utilities (metrics, loaders, helpers)
-│   ├── options/        # Configuration files (model type, hyperparams, ...)
+│   ├── model/          # Model architectures
+│   ├── scripts/        # Reproduction scripts
+│   ├── utils/          # Metrics, loaders, helpers
+│   ├── options/        # Training configs (hyperparameters, model type)
 │   └── train.py        # Main training pipeline
 └── README.md
+```
