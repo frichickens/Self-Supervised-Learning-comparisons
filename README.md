@@ -5,4 +5,5 @@
 - *model: ONLY model architecture
 - *scripts: script to reproduce results
 - *utils: utils for training (calculate metrics, load model, ...)
-- *main.py: main training code
+- *options: config of the training model (model type, hyperparameters, ...)
+- *train.py: main training code
