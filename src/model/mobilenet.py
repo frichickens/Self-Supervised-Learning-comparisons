@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 class MobileNetV1(nn.Module):
-    def __init__(self, ch_in, n_classes):
+    def __init__(self, c_in, c_out):
         super(MobileNetV1, self).__init__()
         
         def conv_bn(inp, oup, stride):
@@ -25,7 +25,7 @@ class MobileNetV1(nn.Module):
                 )
             
         self.model = nn.Sequential(
-            conv_bn(ch_in, 32, 2),      #(224, 224, 3) -> (112,112,32)   
+            conv_bn(c_in, 32, 2),      #(224, 224, 3) -> (112,112,32)   
             conv_dw(32, 64, 1),         #(112,112,32) -> (112,112,64)
             conv_dw(64, 128, 2),        #(112,112,64) -> (56,56,128)
             conv_dw(128, 128, 1),       #(56,56,128) -> (56,56,128)
@@ -41,7 +41,7 @@ class MobileNetV1(nn.Module):
             conv_dw(1024, 1024, 1),     #(7,7,1024) -> (7,7,1024)
             nn.AvgPool2d(7, stride=1)   # average (7,7)
         )
-        self.fc = nn.Linear(1024, n_classes)
+        self.fc = nn.Linear(1024, c_out)
 
     def forward(self, x):
         x = self.model(x)
