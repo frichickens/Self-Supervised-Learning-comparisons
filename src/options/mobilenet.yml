@@ -17,7 +17,9 @@ hyperparameters:
   eta_min: 0.0001
   seed: 42
 
-  validate_freq: 1000
+  validate_mode: epoch
+  validate_step_freq: 100
+  validate_epochs_freq: 1
 
 datasets:
   train:
