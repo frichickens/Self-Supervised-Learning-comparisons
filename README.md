@@ -32,6 +32,13 @@ conda env create -f env.yml
 conda activate ssl_comp
 ```
 
+# Reproduce code:
+
+```
+cd src
+bash ...script in scripts...
+```
+
 # Our processed dataset is public at:
 
 ```
