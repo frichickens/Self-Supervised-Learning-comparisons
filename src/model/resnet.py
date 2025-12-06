@@ -1,6 +1,33 @@
 import torch
 import torch.nn as nn
 
+
+class BasicBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, in_planes, planes, stride=1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes)
+            )
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        out = self.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = self.relu(out)
+        return out
+
+
 class Bottleneck(nn.Module):
     expansion = 4
 
@@ -42,19 +69,14 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=10, num_channels=3):  # Changed default to 10
+    def __init__(self, block, layers, num_classes=10, num_channels=3):  
         super().__init__()
         self.in_channels = 64
 
-        # CHANGE 1: 7x7 -> 3x3, stride 2 -> 1
         self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         
-        # CHANGE 2: Remove maxpool entirely (too aggressive on 32x32)
-        # self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-
-        # layers = [3,4,6,3] for ResNet-50
         self.layer1 = self._make_layer(block, layers[0], planes=64, stride=1)
         self.layer2 = self._make_layer(block, layers[1], planes=128, stride=2)
         self.layer3 = self._make_layer(block, layers[2], planes=256, stride=2)
@@ -93,7 +115,6 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        # Removed maxpool here
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -106,8 +127,11 @@ class ResNet(nn.Module):
 
         return x
 
-
-# CHANGE 3 & 4 & 5: Default num_classes=10, channels=3
+# ResNet-50
 def ResNet50(c_in, c_out):
-    """Factory: returns a ResNet-50 model for CIFAR-10/100."""
     return ResNet(Bottleneck, [3, 4, 6, 3], num_classes=c_out, num_channels=c_in)
+
+
+# ResNet-18 
+def ResNet18(c_in, c_out):
+    return ResNet(BasicBlock, [2, 2, 2, 2], num_classes=c_out, num_channels=c_in)

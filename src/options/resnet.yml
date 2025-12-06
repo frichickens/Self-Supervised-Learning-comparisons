@@ -10,7 +10,7 @@ is_test: true
 
 hyperparameters:
   lr: 0.01
-  epochs: 100
+  epochs: 150
   weight_decay: 1e-4
   beta1: 0.9
   beta2: 0.999
@@ -27,7 +27,7 @@ datasets:
     mode: cifar10
     phase: train
     dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
-    batch_size: 128
+    batch_size: 64
     n_workers: 4
 
   val:
