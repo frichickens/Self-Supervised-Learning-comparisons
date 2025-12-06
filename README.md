@@ -2,9 +2,17 @@
 
 ```
 .
-├── Checkpoints/        # Saved model checkpoints
-├── .env                # Private API keys (HuggingFace, WandB)
+├── Checkpoints/        # folder saves checkpoints
+├── datasets/           
+│   └── cifar10-images/ # images folder (.png with labels)
+│       ├── train/      
+│       ├── test/       
+│       └── valid/
+│    
+├── .env                # private API keys (add yours here, DO NOT replace)
+│
 ├── .gitignore          # Ignored large/unimportant files
+│
 ├── src/                # Main source code
 │   ├── model/          # Model architectures
 │   ├── scripts/        # Reproduction scripts
