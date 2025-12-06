@@ -20,7 +20,16 @@
 │   ├── options/        # Training configs (hyperparameters, model type)
 │   └── train.py        # Main training pipeline
 │
+└── env.yml             # env
+│
 └── README.md
+```
+
+# Setup env:
+
+```
+conda env create -f env.yml
+conda activate ssl_comp
 ```
 
 # Our processed dataset is public at:
