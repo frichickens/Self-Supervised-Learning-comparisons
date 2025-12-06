@@ -19,5 +19,13 @@
 │   ├── utils/          # Metrics, loaders, helpers
 │   ├── options/        # Training configs (hyperparameters, model type)
 │   └── train.py        # Main training pipeline
+│
 └── README.md
+```
+
+# Our processed dataset is public at:
+
+```
+Cifar-10: https://www.kaggle.com/datasets/quocbaohust/cifar10
+Cifar-100: 
 ```
