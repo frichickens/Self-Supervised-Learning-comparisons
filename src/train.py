@@ -144,7 +144,9 @@ def test():
         total_gts = torch.cat(total_gts, dim=0)
         test_loss = total_test_loss / len(test_set)
         test_metrics = calculate_metrics(total_preds, total_gts, num_classes=10)
-    return test_loss, test_metrics
+    for k, v in test_metrics.items():
+        print(f"[TEST] {k}: {v}")
+    wandb.log({f"test_{k}": v for k, v in test_metrics.items()})
 
 
 if __name__ == '__main__':
