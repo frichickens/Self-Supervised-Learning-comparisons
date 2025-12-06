@@ -67,9 +67,11 @@ def train():
             optimizer.step()
             
             global_step += 1
-            
-            if train_hypers['validate_mode'] == 'epoch':
-                if global_step % train_hypers['validate_epoch_freq'] == 0:
+    
+    
+                    
+            if train_hypers['validate_mode'] == 'step':
+                if global_step % (train_hypers['validate_step_freq']) == 0:
                     eval_loss, eval_metrics = validate()
                     print(f"[EVAL] Step {global_step}|{eval_loss}")
                     wandb.log({f"eval_step_{k}": v for k, v in eval_metrics.items()})
@@ -81,20 +83,20 @@ def train():
                         ckpt_name = f"{opt['model']}_{timestamp}_best.pth"
                         ckpt_path = os.path.join(checkpoint_path, ckpt_name)
                         save_checkpoint(model, ckpt_path)
-                    
-            elif train_hypers['validate_mode'] == 'step':
-                if global_step % train_hypers['validate_step_freq'] == 0:
-                    eval_loss, eval_metrics = validate()
-                    print(f"[EVAL] Step {global_step}|{eval_loss}")
-                    wandb.log({f"eval_step_{k}": v for k, v in eval_metrics.items()})
-                    
-                    model.train()
-                    
-                    if eval_metrics['accuracy'] > best_acc:
-                        best_acc = eval_metrics['accuracy']
-                        ckpt_name = f"{opt['model']}_{timestamp}_best.pth"
-                        ckpt_path = os.path.join(checkpoint_path, ckpt_name)
-                        save_checkpoint(model, ckpt_path)
+                        
+        if train_hypers['validate_mode'] == 'epoch':
+            if epoch % int(train_hypers['validate_epochs_freq']) == 0:
+                eval_loss, eval_metrics = validate()
+                print(f"[EVAL] Step {global_step}|{eval_loss}")
+                wandb.log({f"eval_step_{k}": v for k, v in eval_metrics.items()})
+                
+                model.train()
+                
+                if eval_metrics['accuracy'] > best_acc:
+                    best_acc = eval_metrics['accuracy']
+                    ckpt_name = f"{opt['model']}_{timestamp}_best.pth"
+                    ckpt_path = os.path.join(checkpoint_path, ckpt_name)
+                    save_checkpoint(model, ckpt_path)
                     
                     
         total_preds = torch.cat(total_preds, dim=0)

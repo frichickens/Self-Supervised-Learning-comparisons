@@ -10,14 +10,14 @@ is_test: true
 
 hyperparameters:
   lr: 0.01
-  epochs: 40
+  epochs: 100
   weight_decay: 1e-4
   beta1: 0.9
   beta2: 0.999
   eta_min: 0.0001
   seed: 42
 
-  validate_mode: epoch
+  validate_mode: epoch # options: step / epoch
   validate_step_freq: 100
   validate_epochs_freq: 1
 
@@ -26,7 +26,7 @@ datasets:
     mode: cifar10
     phase: train
     dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
-    batch_size: 128
+    batch_size: 256
     n_workers: 4
 
   val:
