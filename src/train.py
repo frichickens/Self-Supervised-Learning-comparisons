@@ -87,7 +87,7 @@ def train():
         if train_hypers['validate_mode'] == 'epoch':
             if epoch % int(train_hypers['validate_epochs_freq']) == 0:
                 eval_loss, eval_metrics = validate()
-                print(f"[EVAL] Step {global_step}|{eval_loss}")
+                print(f"[EVAL] Epoch {epoch}|{eval_loss}")
                 wandb.log({f"eval_step_{k}": v for k, v in eval_metrics.items()})
                 
                 model.train()
