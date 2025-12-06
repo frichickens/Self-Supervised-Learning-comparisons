@@ -7,10 +7,16 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
     average_precision_score,
-    label_binarize,
 )
 import numpy as np
-
+from datetime import datetime
+from sklearn.preprocessing import label_binarize
+from collections import OrderedDict
+import yaml
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 
 
 
@@ -19,7 +25,7 @@ def create_ds(opt):
         if phase=='train': 
             train_set = create_dataset(dataset_opt)
             train_loader = create_dataloader(train_set, dataset_opt, opt, None)
-        elif phase=='valid': 
+        elif phase=='val': 
             valid_set = create_dataset(dataset_opt)
             valid_loader = create_dataloader(valid_set, dataset_opt, opt, None)
         elif phase=='test':
@@ -30,6 +36,10 @@ def create_ds(opt):
 
 
 def load_checkpoint(model, checkpoint_path):
+    if checkpoint_path == "":
+        print("No checkpoint path provided, training from scratch.")
+        return model
+
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint)
     print(f"Loaded checkpoint from {checkpoint_path}")
@@ -40,8 +50,8 @@ def load_checkpoint(model, checkpoint_path):
 def create_optimizer(params, opt):
     return torch.optim.Adam(
         params,
-        lr = opt['lr_G'], betas=(opt['beta1'], opt['beta2']),
-        weight_decay = opt['weight_decay'],
+        lr = opt['lr'], betas=(opt['beta1'], opt['beta2']),
+        weight_decay = float(opt['weight_decay']),
         
     )
 
@@ -92,3 +102,23 @@ def calculate_metrics(
         metrics["pr_auc"] = 0.0
 
     return metrics
+
+
+
+def OrderedYaml():
+    '''yaml orderedDict support'''
+    _mapping_tag = yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG
+
+    def dict_representer(dumper, data):
+        return dumper.represent_dict(data.items())
+
+    def dict_constructor(loader, node):
+        return OrderedDict(loader.construct_pairs(node))
+
+    Dumper.add_representer(OrderedDict, dict_representer)
+    Loader.add_constructor(_mapping_tag, dict_constructor)
+    return Loader, Dumper
+
+
+def get_timestamp():
+    return datetime.now().strftime('%y%m%d-%H%M%S')

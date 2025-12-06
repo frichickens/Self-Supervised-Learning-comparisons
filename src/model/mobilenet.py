@@ -1,50 +1,58 @@
+import torch
 import torch.nn as nn
+
 
 class MobileNetV1(nn.Module):
     def __init__(self, c_in, c_out):
         super(MobileNetV1, self).__init__()
-        
+
         def conv_bn(inp, oup, stride):
             return nn.Sequential(
-                nn.Conv2d(inp, oup, 3, stride, 1),
+                nn.Conv2d(inp, oup, 3, stride, padding=1, bias=False),
                 nn.BatchNorm2d(oup),
                 nn.ReLU(inplace=True)
-                )
+            )
 
         def conv_dw(inp, oup, stride):
             return nn.Sequential(
-                # depth wise
-                nn.Conv2d(inp, inp, 3, stride, 1, groups=inp), #(kernel_size, stride, padding)
+                # Depthwise
+                nn.Conv2d(inp, inp, 3, stride, padding=1, groups=inp, bias=False),
                 nn.BatchNorm2d(inp),
                 nn.ReLU(inplace=True),
-    
-                # point wise
-                nn.Conv2d(inp, oup, 1, 1, 0), #(kernel_size, stride, padding)
+                # Pointwise
+                nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
                 nn.BatchNorm2d(oup),
                 nn.ReLU(inplace=True),
-                )
-            
+            )
+
         self.model = nn.Sequential(
-            conv_bn(c_in, 32, 2),      #(224, 224, 3) -> (112,112,32)   
-            conv_dw(32, 64, 1),         #(112,112,32) -> (112,112,64)
-            conv_dw(64, 128, 2),        #(112,112,64) -> (56,56,128)
-            conv_dw(128, 128, 1),       #(56,56,128) -> (56,56,128)
-            conv_dw(128, 256, 2),       #(56,56,128) -> (28,28,256)
-            conv_dw(256, 256, 1),       #(28,28,256) -> (28,28,256)
-            conv_dw(256, 512, 2),       #(28,28,256) -> (14,14,512) 
-            conv_dw(512, 512, 1),       #(14,14,512) -> (14,14,512)
-            conv_dw(512, 512, 1),       #(14,14,512) -> (14,14,512) 
-            conv_dw(512, 512, 1),       #(14,14,512) -> (14,14,512) 
-            conv_dw(512, 512, 1),       #(14,14,512) -> (14,14,512) 
-            conv_dw(512, 512, 1),       #(14,14,512) -> (14,14,512) 
-            conv_dw(512, 1024, 2),      #(14,14,512) -> (7,7,1024)
-            conv_dw(1024, 1024, 1),     #(7,7,1024) -> (7,7,1024)
-            nn.AvgPool2d(7, stride=1)   # average (7,7)
+            # First layer: stride=1 instead of 2 (critical for 32x32!)
+            conv_bn(c_in, 32, stride=1),        # 32×32×3 → 32×32×32
+
+            conv_dw( 32,  64, 1),            # 32×32×32 → 32×32×64
+            conv_dw( 64, 128, 2),            #          → 16×16×128
+            conv_dw(128, 128, 1),            #          → 16×16×128
+            conv_dw(128, 256, 2),            #          →  8×8×256
+            conv_dw(256, 256, 1),            #          →  8×8×256
+            conv_dw(256, 512, 2),            #          →  4×4×512
+
+            # 5 repeated blocks with 512 channels
+            conv_dw(512, 512, 1),
+            conv_dw(512, 512, 1),
+            conv_dw(512, 512, 1),
+            conv_dw(512, 512, 1),
+            conv_dw(512, 512, 1),
+
+            conv_dw(512, 1024, 2),           #                →  2×2×1024
+            conv_dw(1024, 1024, 1),          #                →  2×2×1024
         )
-        self.fc = nn.Linear(1024, c_out)
+
+        self.classifier = nn.Linear(1024, c_out)
+        self.pool = nn.AdaptiveAvgPool2d(1)   # Works on any size → 1×1
 
     def forward(self, x):
         x = self.model(x)
-        x = x.view(-1, 1024)    #flatten into 1024 values then put into FC
-        x = self.fc(x)
+        x = self.pool(x)              # → (B, 1024, 1, 1)
+        x = x.view(x.size(0), -1)     # → (B, 1024)
+        x = self.classifier(x)
         return x

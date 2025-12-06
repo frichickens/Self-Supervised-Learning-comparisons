@@ -9,7 +9,7 @@ import options.options as option
 import argparse
 
 from dotenv import load_dotenv
-from huggingface_hub import login
+# from huggingface_hub import login
 from utils.utils import *
 from tqdm import tqdm
 
@@ -41,6 +41,7 @@ def train():
     global_step = 0
     
     for epoch in range(train_hypers['epochs']):
+        model.train()
         total_train_loss = 0
         total_preds = []
         total_gts = []
@@ -66,16 +67,20 @@ def train():
             optimizer.step()
             
             global_step += 1
-            if global_step % opt['validate_freq'] == 0:
+            if global_step % train_hypers['validate_freq'] == 0:
                 eval_loss, eval_metrics = validate()
                 print(f"[EVAL] Step {global_step}|{eval_loss}")
                 wandb.log({f"eval_step_{k}": v for k, v in eval_metrics.items()})
                 
+                model.train()
+                
                 if eval_metrics['accuracy'] > best_acc:
                     best_acc = eval_metrics['accuracy']
-                    save_checkpoint(model, os.path.join(checkpoint_path, str(opt['model'] + "_" + timestamp),'_best_model.pth'))
-                
-        
+                    ckpt_name = f"{opt['model']}_{timestamp}_best.pth"
+                    ckpt_path = os.path.join(checkpoint_path, ckpt_name)
+                    save_checkpoint(model, ckpt_path)
+                    
+                    
         total_preds = torch.cat(total_preds, dim=0)
         total_gts = torch.cat(total_gts, dim=0)
         
@@ -88,56 +93,57 @@ def train():
     
 def validate():
     model.eval()
-    
-    total_valid_loss = 0
-    total_preds = []
-    total_gts = []
-    for batch in tqdm(valid_loader, total=len(valid_loader)):  
-        imgs, gts = batch
-        batch_size = imgs.shape[0]
+    with torch.no_grad():
+        total_valid_loss = 0
+        total_preds = []
+        total_gts = []
+        for batch in tqdm(valid_loader, total=len(valid_loader)):  
+            imgs, gts = batch
+            batch_size = imgs.shape[0]
+            
+            imgs = imgs.to(device)
+            gts = gts.to(device)
+            
+            pred = model(imgs)
+            loss = loss_func(pred, gts)
+            
+            total_preds.append(pred.detach().cpu())
+            total_gts.append(gts.detach().cpu())
+            
+            total_valid_loss += loss.item() * batch_size
         
-        imgs = imgs.to(device)
-        gts = gts.to(device)
+        total_preds = torch.cat(total_preds, dim=0)
+        total_gts = torch.cat(total_gts, dim=0)
         
-        pred = model(imgs)
-        loss = loss_func(pred, gts)
-        
-        total_preds.append(pred.detach().cpu())
-        total_gts.append(gts.detach().cpu())
-        
-        total_valid_loss += loss.item() * batch_size
-    
-    total_preds = torch.cat(total_preds, dim=0)
-    total_gts = torch.cat(total_gts, dim=0)
-    
-    eval_loss = total_valid_loss / len(valid_set)
-    eval_metrics = calculate_metrics(total_preds, total_gts, num_classes=10)
+        eval_loss = total_valid_loss / len(valid_set)
+        eval_metrics = calculate_metrics(total_preds, total_gts, num_classes=10)
     return eval_loss, eval_metrics
 
 
 def test():
     model.eval()
     
-    total_test_loss = 0
-    total_preds = []
-    total_gts = []
-    for batch in tqdm(test_loader, total=len(test_loader)):
-        imgs, gts = batch
-        batch_size = imgs.shape[0]
+    with torch.no_grad():
+        total_test_loss = 0
+        total_preds = []
+        total_gts = []
+        for batch in tqdm(test_loader, total=len(test_loader)):
+            imgs, gts = batch
+            batch_size = imgs.shape[0]
+            
+            imgs = imgs.to(device)
+            gts = gts.to(device)
+            
+            pred = model(imgs)
+            loss = loss_func(pred, gts)
+            total_preds.append(pred.detach().cpu())
+            total_gts.append(gts.detach().cpu())
+            total_test_loss += loss.item() * batch_size
         
-        imgs = imgs.to(device)
-        gts = gts.to(device)
-        
-        pred = model(imgs)
-        loss = loss_func(pred, gts)
-        total_preds.append(pred.detach().cpu())
-        total_gts.append(gts.detach().cpu())
-        total_test_loss += loss.item() * batch_size
-    
-    total_preds = torch.cat(total_preds, dim=0)
-    total_gts = torch.cat(total_gts, dim=0)
-    test_loss = total_test_loss / len(test_set)
-    test_metrics = calculate_metrics(total_preds, total_gts, num_classes=10)
+        total_preds = torch.cat(total_preds, dim=0)
+        total_gts = torch.cat(total_gts, dim=0)
+        test_loss = total_test_loss / len(test_set)
+        test_metrics = calculate_metrics(total_preds, total_gts, num_classes=10)
     return test_loss, test_metrics
 
 
@@ -145,7 +151,7 @@ if __name__ == '__main__':
 
     load_dotenv()
     wandb_key=os.getenv('WANDB_KEY')
-    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    timestamp = get_timestamp()
     wandb.login(key=wandb_key)
     wandb.init(
         project="SSL_Comparison",
@@ -156,7 +162,9 @@ if __name__ == '__main__':
     wandb.config.beta1 = opt['hyperparameters']['beta1']
     wandb.config.beta2 = opt['hyperparameters']['beta2']
     wandb.config.eta_min = opt['hyperparameters']['eta_min']
+    wandb.config.weight_decay = opt['hyperparameters']['weight_decay']
     wandb.config.seed = opt['hyperparameters']['seed']
+
         
     if opt['is_train']:
         train()

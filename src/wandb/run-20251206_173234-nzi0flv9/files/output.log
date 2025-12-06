@@ -1,0 +1,7 @@
+  7%|██████▏                                                                             | 26/351 [00:04<00:52,  6.16it/s]
+Traceback (most recent call last):
+  File "/mnt/disk4/baodq/comparision_ssl/src/train.py", line 166, in <module>
+    train()
+  File "/mnt/disk4/baodq/comparision_ssl/src/train.py", line 59, in train
+    total_preds.append(pred.detach().cpu())
+KeyboardInterrupt

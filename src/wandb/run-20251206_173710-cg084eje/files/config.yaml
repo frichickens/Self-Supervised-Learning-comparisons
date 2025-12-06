@@ -1,0 +1,75 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            a3vdhr80blqpsg0kg0xxiqxcaw0taihl:
+                args:
+                    - -opt
+                    - options/mobilenet.yml
+                codePath: src/train.py
+                codePathLocal: train.py
+                cpu_count: 24
+                cpu_count_logical: 32
+                cudaVersion: "12.2"
+                disk:
+                    /:
+                        total: "502392610816"
+                        used: "335575080960"
+                email: dinhquocbao.hust@gmail.com
+                executable: /mnt/disk1/miniconda3/envs/ssl_comp/bin/python
+                git:
+                    commit: 7b06f0d69360ea44187eb8d68b21898a0e8e086c
+                    remote: https://github.com/frichickens/Self-Supervised-Learning-comparisons.git
+                gpu: NVIDIA GeForce RTX 4090
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 16384
+                      memoryTotal: "25757220864"
+                      name: NVIDIA GeForce RTX 4090
+                      uuid: GPU-131c9a56-60f2-3bb0-7b04-575a2e52bd15
+                host: vaipe-Z790-UD-AX
+                memory:
+                    total: "67163844608"
+                os: Linux-5.15.0-139-generic-x86_64-with-glibc2.31
+                program: /mnt/disk4/baodq/comparision_ssl/src/train.py
+                python: CPython 3.9.23
+                root: /mnt/disk4/baodq/comparision_ssl/src
+                startedAt: "2025-12-06T10:37:10.910136Z"
+                writerId: a3vdhr80blqpsg0kg0xxiqxcaw0taihl
+        m: []
+        python_version: 3.9.23
+        t:
+            "1":
+                - 1
+                - 5
+                - 41
+                - 53
+            "2":
+                - 1
+                - 5
+                - 41
+                - 53
+            "3":
+                - 13
+                - 19
+            "4": 3.9.23
+            "5": 0.23.1
+            "8":
+                - 2
+            "12": 0.23.1
+            "13": linux-x86_64
+beta1:
+    value: 0.9
+beta2:
+    value: 0.999
+epochs:
+    value: 40
+eta_min:
+    value: 0.0001
+learning_rate:
+    value: 0.01
+seed:
+    value: 42
+weight_decay:
+    value: "1e-4"

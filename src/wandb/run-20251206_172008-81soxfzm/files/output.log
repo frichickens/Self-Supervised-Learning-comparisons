@@ -1,0 +1,25 @@
+  0%|                                                                                             | 0/351 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "/mnt/disk4/baodq/comparision_ssl/src/train.py", line 166, in <module>
+    train()
+  File "/mnt/disk4/baodq/comparision_ssl/src/train.py", line 56, in train
+    pred = model(imgs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/disk4/baodq/comparision_ssl/src/model/mobilenet.py", line 47, in forward
+    x = self.model(x)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/container.py", line 244, in forward
+    input = module(input)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/ssl_comp/lib/python3.9/site-packages/torch/nn/modules/pooling.py", line 773, in forward
+    return F.avg_pool2d(
+RuntimeError: Given input size: (1024x1x1). Calculated output size: (1024x-5x-5). Output size is too small

@@ -1,4 +1,4 @@
-model: mobilenet
+model: resnet
 seed: 42
 
 pretrain_path: ""

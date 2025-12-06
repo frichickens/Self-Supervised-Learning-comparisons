@@ -42,14 +42,17 @@ class Bottleneck(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=1000, num_channels=3):
+    def __init__(self, block, layers, num_classes=10, num_channels=3):  # Changed default to 10
         super().__init__()
         self.in_channels = 64
 
-        self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        # CHANGE 1: 7x7 -> 3x3, stride 2 -> 1
+        self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        
+        # CHANGE 2: Remove maxpool entirely (too aggressive on 32x32)
+        # self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         # layers = [3,4,6,3] for ResNet-50
         self.layer1 = self._make_layer(block, layers[0], planes=64, stride=1)
@@ -60,7 +63,7 @@ class ResNet(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
-        # weight init (optional but common)
+        # weight init
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
@@ -90,7 +93,7 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        x = self.maxpool(x)
+        # Removed maxpool here
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -104,6 +107,7 @@ class ResNet(nn.Module):
         return x
 
 
-def ResNet50(channels, num_classes):
-    """Factory: returns a ResNet-50 model."""
-    return ResNet(Bottleneck, [3, 4, 6, 3], num_classes=num_classes, num_channels=channels)
+# CHANGE 3 & 4 & 5: Default num_classes=10, channels=3
+def ResNet50(c_in, c_out):
+    """Factory: returns a ResNet-50 model for CIFAR-10/100."""
+    return ResNet(Bottleneck, [3, 4, 6, 3], num_classes=c_out, num_channels=c_in)
