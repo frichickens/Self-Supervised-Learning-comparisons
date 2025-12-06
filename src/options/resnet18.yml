@@ -1,0 +1,47 @@
+model: resnet18
+seed: 42
+
+pretrain_path: ""
+checkpoint_path: /mnt/disk4/baodq/comparision_ssl/checkpoints
+
+out_nc: 10 # number of classes CIFAR10
+is_train: true
+is_test: true
+
+hyperparameters:
+  lr: 0.01
+  epochs: 150
+  weight_decay: 1e-4
+  beta1: 0.9
+  beta2: 0.999
+  eta_min: 0.0001
+  seed: 42
+
+  validate_mode: epoch # options: step / epoch
+  validate_step_freq: 100
+  validate_epochs_freq: 1
+
+
+datasets:
+  train:
+    mode: cifar10
+    phase: train
+    dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
+    batch_size: 64
+    n_workers: 4
+
+  val:
+    mode: cifar10
+    phase: val
+    dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
+    batch_size: 1024
+    n_workers: 4
+
+  test:
+    mode: cifar10
+    phase: test
+    dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
+    batch_size: 1024
+    n_workers: 4
+
+  

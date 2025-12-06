@@ -1,4 +1,4 @@
-model: resnet
+model: resnet34
 seed: 42
 
 pretrain_path: ""
