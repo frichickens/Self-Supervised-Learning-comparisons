@@ -190,5 +190,5 @@ if __name__ == '__main__':
         
     if opt['is_train']:
         train()
-    elif opt['is_test']:
+    if opt['is_test']:
         test()
