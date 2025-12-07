@@ -122,3 +122,9 @@ def OrderedYaml():
 
 def get_timestamp():
     return datetime.now().strftime('%y%m%d-%H%M%S')
+
+def get_model_parameters_number(model):
+    print(model)
+    total_params = sum(p.numel() for p in model.parameters())
+    print(f"Model Parameters: {total_params}")
+    return total_params

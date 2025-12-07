@@ -27,7 +27,7 @@ datasets:
     mode: cifar10
     phase: train
     dataroot: /mnt/disk4/baodq/comparision_ssl/datasets/cifar10_images
-    batch_size: 64
+    batch_size: 128
     n_workers: 4
 
   val:

@@ -40,6 +40,8 @@ def train():
     best_acc = float('-inf')
     global_step = 0
     
+    get_model_parameters_number(model)
+    
     for epoch in range(train_hypers['epochs']):
         model.train()
         total_train_loss = 0
