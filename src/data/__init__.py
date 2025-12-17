@@ -34,6 +34,9 @@ def create_dataset(dataset_opt):
         # New way: use clean ImageFolder version
         from data.cifar10 import CIFAR10ImageFolderDataset as D
 
+    elif mode == 'stl10':
+        from data.stl10 import STL10ImageFolderDataset as D
+
     else:
         raise NotImplementedError(f'Dataset [{mode}] is not recognized.')
 
