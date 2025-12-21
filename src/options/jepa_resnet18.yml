@@ -1,0 +1,69 @@
+name: jepa_resnet18_cifar10
+seed: 42
+
+# Pretraining mode
+pretrain_path: ""
+checkpoint_path: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/checkpoints
+
+# Model configuration
+backbone:
+  name: resnet18  # timm model name
+
+input_size: 224  # Input image size (CIFAR-10 will be resized from 32x32)
+use_projection_head: true
+projection_dim: 256
+predictor_layers: 2
+
+# Momentum encoder parameters
+momentum_start: 0.996
+momentum_end: 1.0
+
+# Masking strategy (I-JEPA style)
+mask:
+  enc_mask_scale: [0.85, 1.0]  # Context mask covers 85-100% of image
+  pred_mask_scale: [0.15, 0.2]  # Target mask covers 15-20% of image
+  aspect_ratio: [0.75, 1.5]     # Aspect ratio range for target blocks
+  num_enc_blocks: 1              # Number of context blocks
+  num_pred_blocks: 4             # Number of target blocks
+  min_keep: 4                    # Minimum patches to keep
+  allow_overlap: false           # Whether to allow overlap between context and target
+
+# Training hyperparameters
+hyperparameters:
+  lr: 0.001
+  epochs: 200
+  weight_decay: 1e-4
+  beta1: 0.9
+  beta2: 0.999
+  eta_min: 0.00001
+  seed: 42
+
+  validate_mode: epoch
+  validate_step_freq: 100
+  validate_epochs_freq: 5
+
+# Dataset configuration (CIFAR-10)
+datasets:
+  train:
+    mode: cifar10
+    phase: train
+    dataroot: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/datasets
+    resize: 224  # Resize CIFAR-10 from 32x32 to 224x224
+    batch_size: 256
+    n_workers: 4
+
+  val:
+    mode: cifar10
+    phase: val
+    dataroot: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/datasets
+    resize: 224  # Resize CIFAR-10 from 32x32 to 224x224
+    batch_size: 256
+    n_workers: 4
+
+  test:
+    mode: cifar10
+    phase: test
+    dataroot: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/datasets
+    resize: 224  # Resize CIFAR-10 from 32x32 to 224x224
+    batch_size: 256
+    n_workers: 4

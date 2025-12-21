@@ -1,384 +1,413 @@
 import os
-import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
+import wandb
+import argparse
 from tqdm import tqdm
-import numpy as np
-from datetime import datetime
+from dotenv import load_dotenv
 
-from model.mobilenet_JEPA import MobileNet_JEPA
-
-def create_random_masks(batch_size, num_patches, context_ratio=0.7, device='cuda'):
-    """
-    Create random masks for context and target patches
-    
-    Args:
-        batch_size: number of images in batch
-        num_patches: total number of patches (256 for 16x16 grid)
-        context_ratio: ratio of patches to keep as context (0.7 = 70%)
-        device: torch device
-    
-    Returns:
-        context_mask: indices of context patches [B, N_context]
-        target_mask: indices of target patches [B, N_target]
-    """
-    num_context = int(num_patches * context_ratio)
-    num_target = int(num_patches * (1 - context_ratio))
-    
-    # Create different random masks for each image in batch
-    context_mask = torch.stack([
-        torch.randperm(num_patches)[:num_context] 
-        for _ in range(batch_size)
-    ]).to(device)
-    
-    target_mask = torch.stack([
-        torch.randperm(num_patches)[:num_target] 
-        for _ in range(batch_size)
-    ]).to(device)
-    
-    return context_mask, target_mask
+import options.options as option
+from utils.utils import *
+from pretrain.ijepa_mask import MultiBlockMask
+from model.resnet_JEPA import ResNet
+from timm.models import create_model as timm_create_model
 
 
-def train_one_epoch(model, train_loader, optimizer, scheduler, device, epoch, args):
-    """Train for one epoch"""
-    model.train()
-    # Set target encoder to eval mode (it should not be trained)
-    model.target_encoder.eval()
+parser = argparse.ArgumentParser()
+parser.add_argument('-opt', type=str, help='Path to option YAML file.')
+parser.add_argument('-root', type=str, default=None, choices=['.'])
+args = parser.parse_args()
+opt = option.parse(args.opt, root=args.root)
+opt = option.dict_to_nonedict(opt)
+
+
+class IJEPAResNet(nn.Module):
+    """I-JEPA with ResNet backbone for self-supervised pretraining"""
     
-    total_loss = 0
-    num_batches = len(train_loader)
-    
-    pbar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{args.epochs}')
-    
-    for batch_idx, (images, _) in enumerate(pbar):
-        images = images.to(device, non_blocking=True)
-        batch_size = images.shape[0]
+    def __init__(self, opt):
+        super().__init__()
+        self.opt = opt
         
-        # Create random masks for this batch
-        context_mask, target_mask = create_random_masks(
-            batch_size, 
-            args.num_patches, 
-            args.context_ratio,
-            device
+        # Create backbone (encoder)
+        self.backbone = timm_create_model(
+            opt['backbone']['name'],
+            pretrained=False,
+            num_classes=0  # Remove classification head
         )
         
-        # Forward pass through target encoder (no grad)
-        with torch.no_grad():
-            target_features = model.target_encoder(images, masks=[target_mask])
-            # Normalize target features over feature dimension (as in original I-JEPA)
-            target_features = F.layer_norm(target_features, (target_features.size(-1),))
+        # Get feature dimensions
+        self.downsample_ratio = self.backbone.get_downsample_ratio()
+        self.feature_channels = self.backbone.get_feature_map_channels()[-1]
         
-        # Forward pass through context encoder and predictor
-        context_features = model.context_encoder(images, masks=[context_mask])
-        predictions = model.predictor(context_features, masks_x=[context_mask], masks=[target_mask])
+        # Momentum encoder (target network)
+        self.backbone_momentum = timm_create_model(
+            opt['backbone']['name'],
+            pretrained=False,
+            num_classes=0
+        )
+        self.backbone_momentum.load_state_dict(self.backbone.state_dict())
         
-        # Compute loss (smooth L1 loss as in I-JEPA paper)
-        loss = F.smooth_l1_loss(predictions, target_features)
+        # Freeze momentum encoder
+        for param in self.backbone_momentum.parameters():
+            param.requires_grad = False
         
-        # Backward pass
-        optimizer.zero_grad()
-        loss.backward()
-        
-        # Gradient clipping
-        if args.clip_grad > 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_grad)
-        
-        optimizer.step()
-        
-        # Step scheduler (per iteration)
-        if scheduler is not None:
-            scheduler.step()
-        
-        # Update target encoder with EMA (as in original I-JEPA)
-        with torch.no_grad():
-            for param_q, param_k in zip(model.context_encoder.parameters(), model.target_encoder.parameters()):
-                param_k.data.mul_(args.ema_momentum).add_(param_q.data, alpha=1.0 - args.ema_momentum)
-        
-        # Track loss
-        total_loss += loss.item()
-        avg_loss = total_loss / (batch_idx + 1)
-        
-        # Update progress bar with VRAM info
-        mem_mb = torch.cuda.max_memory_allocated() / 1024.**2 if torch.cuda.is_available() else 0
-        pbar.set_postfix({
-            'loss': f'{loss.item():.4f}',
-            'avg_loss': f'{avg_loss:.4f}',
-            'lr': f'{optimizer.param_groups[0]["lr"]:.6f}',
-            'mem_MB': f'{mem_mb:.0f}'
-        })
-    
-    return total_loss / num_batches
-
-
-def validate(model, val_loader, device, args):
-    """Validate the model"""
-    model.eval()
-    total_loss = 0
-    num_batches = len(val_loader)
-    
-    with torch.no_grad():
-        for images, _ in tqdm(val_loader, desc='Validation'):
-            images = images.to(device, non_blocking=True)
-            batch_size = images.shape[0]
-            
-            # Create random masks
-            context_mask, target_mask = create_random_masks(
-                batch_size, 
-                args.num_patches, 
-                args.context_ratio,
-                device
+        # Projection heads (optional)
+        if opt.get('use_projection_head', True):
+            proj_dim = opt.get('projection_dim', 256)
+            self.projection_head = nn.Sequential(
+                nn.Conv2d(self.feature_channels, proj_dim, 1),
+                nn.BatchNorm2d(proj_dim),
+                nn.ReLU(inplace=True)
             )
-            
-            # Forward pass through target encoder
-            target_features = model.target_encoder(images, masks=[target_mask])
-            target_features = F.layer_norm(target_features, (target_features.size(-1),))
-            
-            # Forward pass through context encoder and predictor
-            context_features = model.context_encoder(images, masks=[context_mask])
-            predictions = model.predictor(context_features, masks_x=[context_mask], masks=[target_mask])
-            
-            # Compute loss
-            loss = F.smooth_l1_loss(predictions, target_features)
-            total_loss += loss.item()
+            self.projection_head_momentum = nn.Sequential(
+                nn.Conv2d(self.feature_channels, proj_dim, 1),
+                nn.BatchNorm2d(proj_dim),
+                nn.ReLU(inplace=True)
+            )
+            self.projection_head_momentum.load_state_dict(self.projection_head.state_dict())
+            for param in self.projection_head_momentum.parameters():
+                param.requires_grad = False
+            feature_dim = proj_dim
+        else:
+            self.projection_head = None
+            self.projection_head_momentum = None
+            feature_dim = self.feature_channels
+        
+        # Predictor (decodes masked tokens)
+        n_layers = opt.get('predictor_layers', 2)
+        predictor_layers = []
+        for i in range(n_layers):
+            predictor_layers.extend([
+                nn.Conv2d(feature_dim, feature_dim, 3, padding=1),
+                nn.BatchNorm2d(feature_dim),
+                nn.ReLU(inplace=True)
+            ])
+        self.predictor = nn.Sequential(*predictor_layers)
+        
+        # Mask token (learnable)
+        self.mask_token = nn.Parameter(torch.zeros(1, feature_dim, 1, 1))
+        nn.init.trunc_normal_(self.mask_token, std=0.02)
+        
+    def forward_encoder(self, x, mask=None):
+        """Forward through encoder with optional masking"""
+        # Get features
+        feats = self.backbone(x, hierarchical=True)
+        features = feats[-1]  # Take last layer features
+        
+        if self.projection_head is not None:
+            features = self.projection_head(features)
+        
+        # Apply mask if provided
+        if mask is not None:
+            # mask: (B, 1, H, W) where 1=visible, 0=masked
+            features = features * mask
+        
+        return features
     
-    return total_loss / num_batches
-
-
-def save_checkpoint(model, optimizer, epoch, loss, args, filename='checkpoint.pth'):
-    """Save model checkpoint"""
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss,
-        'args': args
-    }
+    @torch.no_grad()
+    def forward_momentum(self, x):
+        """Forward through momentum encoder"""
+        feats = self.backbone_momentum(x, hierarchical=True)
+        features = feats[-1]
+        
+        if self.projection_head_momentum is not None:
+            features = self.projection_head_momentum(features)
+        
+        return features
     
-    save_path = os.path.join(args.save_dir, filename)
-    torch.save(checkpoint, save_path)
-    print(f'Checkpoint saved to {save_path}')
+    def forward(self, x):
+        """Full forward pass with masking"""
+        B, C, H, W = x.shape
+        
+        # Generate masks
+        fmap_h = H // self.downsample_ratio
+        fmap_w = W // self.downsample_ratio
+        
+        context_mask, target_mask = self.get_mask(B, fmap_h, fmap_w, x.device)
+        
+        # Encode with context mask
+        features = self.forward_encoder(x, context_mask)
+        
+        # Fill masked positions with mask tokens
+        mask_tokens = self.mask_token.expand_as(features)
+        features_with_mask = torch.where(
+            context_mask.expand_as(features), 
+            features, 
+            mask_tokens
+        )
+        
+        # Predict
+        predictions = self.predictor(features_with_mask)
+        
+        # Get target features (no masking, no gradients)
+        with torch.no_grad():
+            targets = self.forward_momentum(x)
+        
+        return predictions, targets, context_mask, target_mask
+    
+    def get_mask(self, B, H, W, device):
+        """Generate context and target masks"""
+        if not hasattr(self, 'mask_generator'):
+            raise RuntimeError("Mask generator not initialized. Call setup_mask_generator first.")
+        
+        context_mask, target_mask = self.mask_generator(B)
+        context_mask = context_mask.unsqueeze(1).to(device, dtype=torch.bool)
+        target_mask = target_mask.unsqueeze(1).to(device, dtype=torch.bool)
+        
+        return context_mask, target_mask
+    
+    def setup_mask_generator(self, input_size):
+        """Setup the mask generator"""
+        self.mask_generator = MultiBlockMask(
+            input_size=input_size,
+            patch_size=self.downsample_ratio,
+            **self.opt['mask']
+        )
+    
+    @torch.no_grad()
+    def update_momentum_encoder(self, momentum):
+        """Update momentum encoder with EMA"""
+        for param, param_m in zip(self.backbone.parameters(), 
+                                   self.backbone_momentum.parameters()):
+            param_m.data = param_m.data * momentum + param.data * (1.0 - momentum)
+        
+        if self.projection_head is not None:
+            for param, param_m in zip(self.projection_head.parameters(),
+                                       self.projection_head_momentum.parameters()):
+                param_m.data = param_m.data * momentum + param.data * (1.0 - momentum)
 
 
-def main(args):
-    # Set device
+def train():
+    """Main training function"""
+    
+    # Setup
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f'Using device: {device}')
     
-    # Create save directory
-    os.makedirs(args.save_dir, exist_ok=True)
+    # Create model
+    model = IJEPAResNet(opt)
+    model.setup_mask_generator(opt['input_size'])
+    model = model.to(device)
     
-    # Data augmentation for I-JEPA (minimal, since we're doing masking)
+    # CIFAR-10 normalization constants
+    CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
+    CIFAR10_STD = (0.2470, 0.2435, 0.2616)
+    
+    # STL-10 normalization constants
+    STL10_MEAN = (0.44671088457107544, 0.43981093168258667, 0.40664660930633545)
+    STL10_STD = (0.26034072041511536, 0.256574809551239, 0.2712670564651489)
+    
+    # Get dataset root from config
+    dataset_root = opt['datasets']['train'].get('dataroot', './datasets')
+    input_size = opt['input_size']
+    
+    # Training transforms with resize
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(32, scale=(0.8, 1.0)),
+        transforms.Resize(input_size),
+        transforms.RandomCrop(input_size, padding=input_size//7),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+        transforms.Normalize(STL10_MEAN, STL10_STD),
     ])
     
+    # Validation transforms
     val_transform = transforms.Compose([
+        transforms.Resize(input_size),
         transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+        transforms.Normalize(STL10_MEAN, STL10_STD),
     ])
     
-    # Load CIFAR-10 dataset
-    train_dataset = datasets.CIFAR10(
-        root=args.data_root,
-        train=True,
+    # Create datasets using torchvision.datasets.CIFAR10
+    # train_set = datasets.CIFAR10(
+    #     root=dataset_root,
+    #     train=True,
+    #     download=False,
+    #     transform=train_transform
+    # )
+    
+    # valid_set = datasets.CIFAR10(
+    #     root=dataset_root,
+    #     train=False,
+    #     download=False,
+    #     transform=val_transform
+    # )
+    # Create datasets using torchvision.datasets.STL10
+    
+    train_set = datasets.STL10(
+        root=dataset_root,
+        split='unlabeled',
         download=True,
         transform=train_transform
     )
     
-    val_dataset = datasets.CIFAR10(
-        root=args.data_root,
-        train=False,
+    valid_set = datasets.STL10(
+        root=dataset_root,
+        split='test',
         download=True,
         transform=val_transform
     )
     
-    # Create data loaders
-    train_loader = DataLoader(
-        train_dataset,
-        batch_size=args.batch_size,
+    
+    # Create dataloaders
+    train_loader = torch.utils.data.DataLoader(
+        train_set,
+        batch_size=opt['datasets']['train']['batch_size'],
         shuffle=True,
-        num_workers=args.num_workers,
+        num_workers=opt['datasets']['train'].get('n_workers', 4),
         pin_memory=True,
-        drop_last=True  # Drop last incomplete batch
+        drop_last=True
     )
     
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=args.batch_size,
+    valid_loader = torch.utils.data.DataLoader(
+        valid_set,
+        batch_size=opt['datasets']['val']['batch_size'],
         shuffle=False,
-        num_workers=args.num_workers,
-        pin_memory=True
+        num_workers=opt['datasets']['val'].get('n_workers', 4),
+        pin_memory=True,
+        drop_last=False
     )
     
-    print(f'Train samples: {len(train_dataset)}')
-    print(f'Val samples: {len(val_dataset)}')
-    print(f'Batch size: {args.batch_size}')
-    print(f'Train batches: {len(train_loader)}')
-    
-    # Create model
-    model = MobileNet_JEPA(
-        c_in=3,
-        embed_dim=args.embed_dim,
-        predictor_embed_dim=args.predictor_embed_dim,
-        num_patches=args.num_patches,
-        predictor_depth=args.predictor_depth,
-        predictor_num_heads=args.predictor_num_heads,
-        momentum=args.ema_momentum
-    ).to(device)
-    
-    # Freeze target encoder parameters (as in original I-JEPA)
-    for p in model.target_encoder.parameters():
-        p.requires_grad = False
-    
-    # Count parameters
-    total_params = sum(p.numel() for p in model.parameters())
-    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(f'\nModel created:')
-    print(f'Total parameters: {total_params / 1e6:.2f}M')
-    print(f'Trainable parameters: {trainable_params / 1e6:.2f}M')
-    print(f'Target encoder parameters (frozen): {sum(p.numel() for p in model.target_encoder.parameters()) / 1e6:.2f}M')
-    
-    # Create optimizer (only for trainable parameters)
-    optimizer = torch.optim.AdamW(
-        filter(lambda p: p.requires_grad, model.parameters()),
-        lr=args.lr,
-        weight_decay=args.weight_decay,
-        betas=(0.9, 0.999)
+    # Optimizer and scheduler
+    train_hypers = opt['hyperparameters']
+    optimizer = create_optimizer(model.parameters(), train_hypers)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, 
+        train_hypers['epochs'], 
+        train_hypers['eta_min']
     )
-    
-    # Learning rate scheduler with warmup (per iteration, not per epoch)
-    total_steps = args.epochs * len(train_loader)
-    warmup_steps = args.warmup * len(train_loader)
-    
-    if args.use_scheduler:
-        # Warmup + Cosine annealing scheduler
-        def lr_lambda(step):
-            if step < warmup_steps:
-                # Linear warmup
-                return step / warmup_steps
-            else:
-                # Cosine annealing
-                progress = (step - warmup_steps) / (total_steps - warmup_steps)
-                return args.min_lr / args.lr + (1 - args.min_lr / args.lr) * 0.5 * (1 + np.cos(np.pi * progress))
-        
-        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-    else:
-        scheduler = None
-    
-    # Load checkpoint if resuming
-    start_epoch = 0
-    best_val_loss = float('inf')
-    
-    if args.resume:
-        if os.path.isfile(args.resume):
-            print(f'Loading checkpoint from {args.resume}')
-            checkpoint = torch.load(args.resume, map_location=device)
-            model.load_state_dict(checkpoint['model_state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-            start_epoch = checkpoint['epoch'] + 1
-            best_val_loss = checkpoint.get('loss', float('inf'))
-            print(f'Resumed from epoch {start_epoch}')
-        else:
-            print(f'No checkpoint found at {args.resume}')
     
     # Training loop
-    print(f'\nStarting training for {args.epochs} epochs...\n')
+    best_loss = float('inf')
+    global_step = 0
+    momentum = opt.get('momentum_start', 0.996)
+    momentum_end = opt.get('momentum_end', 1.0)
     
-    for epoch in range(start_epoch, args.epochs):
-        # Train
-        train_loss = train_one_epoch(model, train_loader, optimizer, scheduler, device, epoch, args)
+    get_model_parameters_number(model)
+    
+    for epoch in range(train_hypers['epochs']):
+        model.train()
+        total_train_loss = 0
         
-        # Validate
-        if (epoch + 1) % args.val_freq == 0:
-            val_loss = validate(model, val_loader, device, args)
-            print(f'Epoch {epoch+1}/{args.epochs} - Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+        # Update momentum
+        m = momentum + (momentum_end - momentum) * (epoch / train_hypers['epochs'])
+        
+        for batch_idx, batch in enumerate(tqdm(train_loader, desc=f"Epoch {epoch}")):
+            imgs, _ = batch  # We don't need labels for pretraining
+            imgs = imgs.to(device)
+            batch_size = imgs.shape[0]
+            
+            optimizer.zero_grad()
+            
+            # Forward pass
+            predictions, targets, context_mask, target_mask = model(imgs)
+            
+            # Normalize features
+            predictions = F.normalize(predictions, dim=1)
+            targets = F.normalize(targets, dim=1)
+            
+            # Compute loss only on target (masked) regions
+            loss = F.smooth_l1_loss(predictions, targets, reduction='none').sum(dim=1, keepdim=True)
+            loss = loss.mul_(target_mask).sum() / (target_mask.sum() + 1e-8)
+            
+            # Backward and optimize
+            loss.backward()
+            optimizer.step()
+            
+            # Update momentum encoder
+            model.update_momentum_encoder(m)
+            
+            total_train_loss += loss.item() * batch_size
+            global_step += 1
+            
+            # Log to wandb
+            if global_step % 10 == 0:
+                wandb.log({
+                    'train/loss': loss.item(),
+                    'train/momentum': m,
+                    'train/lr': optimizer.param_groups[0]['lr'],
+                    'step': global_step
+                })
+        
+        # Epoch metrics
+        avg_train_loss = total_train_loss / len(train_set)
+        print(f"[Train] Epoch {epoch} | Loss: {avg_train_loss:.4f}")
+        wandb.log({'train/epoch_loss': avg_train_loss, 'epoch': epoch})
+        
+        # Validation
+        if epoch % train_hypers.get('validate_epochs_freq', 5) == 0:
+            val_loss = validate(model, valid_loader, device)
+            print(f"[Val] Epoch {epoch} | Loss: {val_loss:.4f}")
+            wandb.log({'val/loss': val_loss, 'epoch': epoch})
             
             # Save best model
-            if val_loss < best_val_loss:
-                best_val_loss = val_loss
-                save_checkpoint(model, optimizer, epoch, val_loss, args, 'best_model.pth')
-                print(f'New best model saved! Val Loss: {val_loss:.4f}')
-        else:
-            print(f'Epoch {epoch+1}/{args.epochs} - Train Loss: {train_loss:.4f}')
+            if val_loss < best_loss:
+                best_loss = val_loss
+                checkpoint_path = opt['checkpoint_path']
+                os.makedirs(checkpoint_path, exist_ok=True)
+                ckpt_name = f"{opt['name']}_best.pth"
+                ckpt_path = os.path.join(checkpoint_path, ckpt_name)
+                save_checkpoint(model, ckpt_path)
+                print(f"Saved best model with loss: {best_loss:.4f}")
         
-        # Save checkpoint periodically
-        if (epoch + 1) % args.save_freq == 0:
-            save_checkpoint(model, optimizer, epoch, train_loss, args, f'checkpoint_epoch_{epoch+1}.pth')
+        lr_scheduler.step()
     
     # Save final model
-    save_checkpoint(model, optimizer, args.epochs-1, train_loss, args, 'final_model.pth')
-    print('\nTraining completed!')
+    checkpoint_path = opt['checkpoint_path']
+    ckpt_name = f"{opt['name']}_final.pth"
+    ckpt_path = os.path.join(checkpoint_path, ckpt_name)
+    save_checkpoint(model, ckpt_path)
+    print("Training completed!")
+
+
+@torch.no_grad()
+def validate(model, dataloader, device):
+    """Validation function"""
+    model.eval()
+    total_loss = 0
+    total_samples = 0
+    
+    for batch in tqdm(dataloader, desc="Validating"):
+        imgs, _ = batch
+        imgs = imgs.to(device)
+        batch_size = imgs.shape[0]
+        
+        # Forward pass
+        predictions, targets, context_mask, target_mask = model(imgs)
+        
+        # Normalize features
+        predictions = F.normalize(predictions, dim=1)
+        targets = F.normalize(targets, dim=1)
+        
+        # Compute loss
+        loss = F.smooth_l1_loss(predictions, targets, reduction='none').sum(dim=1, keepdim=True)
+        loss = loss.mul_(target_mask).sum() / (target_mask.sum() + 1e-8)
+        
+        total_loss += loss.item() * batch_size
+        total_samples += batch_size
+    
+    model.train()
+    return total_loss / total_samples
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Pre-train MobileNet-JEPA on CIFAR-10')
+    load_dotenv()
+    wandb_key = os.getenv('WANDB_KEY')
+    timestamp = get_timestamp()
     
-    # Data arguments
-    parser.add_argument('--data_root', type=str, default='./data', 
-                        help='Path to CIFAR-10 data directory')
-    parser.add_argument('--batch_size', type=int, default=128,
-                        help='Batch size for training')
-    parser.add_argument('--num_workers', type=int, default=4,
-                        help='Number of data loading workers')
+    wandb.init(
+        project="SSL_Comparison",
+        name=f"{opt['name']}-{timestamp}"
+    )
     
-    # Model arguments
-    parser.add_argument('--embed_dim', type=int, default=512,
-                        help='Embedding dimension for encoder')
-    parser.add_argument('--predictor_embed_dim', type=int, default=256,
-                        help='Embedding dimension for predictor')
-    parser.add_argument('--predictor_depth', type=int, default=6,
-                        help='Number of transformer blocks in predictor')
-    parser.add_argument('--predictor_num_heads', type=int, default=8,
-                        help='Number of attention heads in predictor')
-    parser.add_argument('--num_patches', type=int, default=256,
-                        help='Number of patches (16x16 for 32x32 images)')
+    wandb.config.update({
+        'learning_rate': opt['hyperparameters']['lr'],
+        'epochs': opt['hyperparameters']['epochs'],
+        'batch_size': opt['datasets']['train']['batch_size'],
+        'backbone': opt['backbone']['name'],
+        'input_size': opt['input_size'],
+        'mask_strategy': opt['mask']
+    })
     
-    # Masking arguments
-    parser.add_argument('--context_ratio', type=float, default=0.7,
-                        help='Ratio of patches to use as context (0.7 = 70%)')
-    
-    # Training arguments
-    parser.add_argument('--epochs', type=int, default=200,
-                        help='Number of training epochs')
-    parser.add_argument('--lr', type=float, default=1e-3,
-                        help='Learning rate')
-    parser.add_argument('--min_lr', type=float, default=1e-6,
-                        help='Minimum learning rate for scheduler')
-    parser.add_argument('--weight_decay', type=float, default=0.05,
-                        help='Weight decay')
-    parser.add_argument('--warmup', type=int, default=10,
-                        help='Number of warmup epochs')
-    parser.add_argument('--clip_grad', type=float, default=1.0,
-                        help='Gradient clipping value (0 to disable)')
-    parser.add_argument('--ema_momentum', type=float, default=0.996,
-                        help='EMA momentum for target encoder')
-    parser.add_argument('--use_scheduler', action='store_true', default=True,
-                        help='Use cosine annealing scheduler with warmup')
-    
-    # Checkpointing arguments
-    parser.add_argument('--save_dir', type=str, default='./checkpoints_jepa_pretrain',
-                        help='Directory to save checkpoints')
-    parser.add_argument('--save_freq', type=int, default=50,
-                        help='Save checkpoint every N epochs')
-    parser.add_argument('--val_freq', type=int, default=5,
-                        help='Validate every N epochs')
-    parser.add_argument('--resume', type=str, default='',
-                        help='Path to checkpoint to resume from')
-    
-    args = parser.parse_args()
-    
-    # Print configuration
-    print('='*60)
-    print('I-JEPA Pre-training Configuration')
-    print('='*60)
-    for arg in vars(args):
-        print(f'{arg}: {getattr(args, arg)}')
-    print('='*60 + '\n')
-    
-    main(args)
+    train()
+    wandb.finish()
