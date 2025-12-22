@@ -10,10 +10,8 @@ from dotenv import load_dotenv
 
 import options.options as option
 from utils.utils import *
-from pretrain.ijepa_mask import MultiBlockMask
-from model.resnet_JEPA import ResNet
-from timm.models import create_model as timm_create_model
-
+from utils.jepa_utils import JEPALoss
+from model.resnet_JEPA import ResnetJEPA
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-opt', type=str, help='Path to option YAML file.')
@@ -23,162 +21,6 @@ opt = option.parse(args.opt, root=args.root)
 opt = option.dict_to_nonedict(opt)
 
 
-class IJEPAResNet(nn.Module):
-    """I-JEPA with ResNet backbone for self-supervised pretraining"""
-    
-    def __init__(self, opt):
-        super().__init__()
-        self.opt = opt
-        
-        # Create backbone (encoder)
-        self.backbone = timm_create_model(
-            opt['backbone']['name'],
-            pretrained=False,
-            num_classes=0  # Remove classification head
-        )
-        
-        # Get feature dimensions
-        self.downsample_ratio = self.backbone.get_downsample_ratio()
-        self.feature_channels = self.backbone.get_feature_map_channels()[-1]
-        
-        # Momentum encoder (target network)
-        self.backbone_momentum = timm_create_model(
-            opt['backbone']['name'],
-            pretrained=False,
-            num_classes=0
-        )
-        self.backbone_momentum.load_state_dict(self.backbone.state_dict())
-        
-        # Freeze momentum encoder
-        for param in self.backbone_momentum.parameters():
-            param.requires_grad = False
-        
-        # Projection heads (optional)
-        if opt.get('use_projection_head', True):
-            proj_dim = opt.get('projection_dim', 256)
-            self.projection_head = nn.Sequential(
-                nn.Conv2d(self.feature_channels, proj_dim, 1),
-                nn.BatchNorm2d(proj_dim),
-                nn.ReLU(inplace=True)
-            )
-            self.projection_head_momentum = nn.Sequential(
-                nn.Conv2d(self.feature_channels, proj_dim, 1),
-                nn.BatchNorm2d(proj_dim),
-                nn.ReLU(inplace=True)
-            )
-            self.projection_head_momentum.load_state_dict(self.projection_head.state_dict())
-            for param in self.projection_head_momentum.parameters():
-                param.requires_grad = False
-            feature_dim = proj_dim
-        else:
-            self.projection_head = None
-            self.projection_head_momentum = None
-            feature_dim = self.feature_channels
-        
-        # Predictor (decodes masked tokens)
-        n_layers = opt.get('predictor_layers', 2)
-        predictor_layers = []
-        for i in range(n_layers):
-            predictor_layers.extend([
-                nn.Conv2d(feature_dim, feature_dim, 3, padding=1),
-                nn.BatchNorm2d(feature_dim),
-                nn.ReLU(inplace=True)
-            ])
-        self.predictor = nn.Sequential(*predictor_layers)
-        
-        # Mask token (learnable)
-        self.mask_token = nn.Parameter(torch.zeros(1, feature_dim, 1, 1))
-        nn.init.trunc_normal_(self.mask_token, std=0.02)
-        
-    def forward_encoder(self, x, mask=None):
-        """Forward through encoder with optional masking"""
-        # Get features
-        feats = self.backbone(x, hierarchical=True)
-        features = feats[-1]  # Take last layer features
-        
-        if self.projection_head is not None:
-            features = self.projection_head(features)
-        
-        # Apply mask if provided
-        if mask is not None:
-            # mask: (B, 1, H, W) where 1=visible, 0=masked
-            features = features * mask
-        
-        return features
-    
-    @torch.no_grad()
-    def forward_momentum(self, x):
-        """Forward through momentum encoder"""
-        feats = self.backbone_momentum(x, hierarchical=True)
-        features = feats[-1]
-        
-        if self.projection_head_momentum is not None:
-            features = self.projection_head_momentum(features)
-        
-        return features
-    
-    def forward(self, x):
-        """Full forward pass with masking"""
-        B, C, H, W = x.shape
-        
-        # Generate masks
-        fmap_h = H // self.downsample_ratio
-        fmap_w = W // self.downsample_ratio
-        
-        context_mask, target_mask = self.get_mask(B, fmap_h, fmap_w, x.device)
-        
-        # Encode with context mask
-        features = self.forward_encoder(x, context_mask)
-        
-        # Fill masked positions with mask tokens
-        mask_tokens = self.mask_token.expand_as(features)
-        features_with_mask = torch.where(
-            context_mask.expand_as(features), 
-            features, 
-            mask_tokens
-        )
-        
-        # Predict
-        predictions = self.predictor(features_with_mask)
-        
-        # Get target features (no masking, no gradients)
-        with torch.no_grad():
-            targets = self.forward_momentum(x)
-        
-        return predictions, targets, context_mask, target_mask
-    
-    def get_mask(self, B, H, W, device):
-        """Generate context and target masks"""
-        if not hasattr(self, 'mask_generator'):
-            raise RuntimeError("Mask generator not initialized. Call setup_mask_generator first.")
-        
-        context_mask, target_mask = self.mask_generator(B)
-        context_mask = context_mask.unsqueeze(1).to(device, dtype=torch.bool)
-        target_mask = target_mask.unsqueeze(1).to(device, dtype=torch.bool)
-        
-        return context_mask, target_mask
-    
-    def setup_mask_generator(self, input_size):
-        """Setup the mask generator"""
-        self.mask_generator = MultiBlockMask(
-            input_size=input_size,
-            patch_size=self.downsample_ratio,
-            **self.opt['mask']
-        )
-    
-    @torch.no_grad()
-    def update_momentum_encoder(self, momentum):
-        """Update momentum encoder with EMA"""
-        for param, param_m in zip(self.backbone.parameters(), 
-                                   self.backbone_momentum.parameters()):
-            param_m.data = param_m.data * momentum + param.data * (1.0 - momentum)
-        
-        if self.projection_head is not None:
-            for param, param_m in zip(self.projection_head.parameters(),
-                                       self.projection_head_momentum.parameters()):
-                param_m.data = param_m.data * momentum + param.data * (1.0 - momentum)
-
-
 def train():
     """Main training function"""
     
@@ -186,9 +28,12 @@ def train():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # Create model
-    model = IJEPAResNet(opt)
+    model = ResnetJEPA(opt)
     model.setup_mask_generator(opt['input_size'])
     model = model.to(device)
+    
+    # Create loss function
+    criterion = JEPALoss(loss_type='smooth_l1', normalize=True)
     
     # CIFAR-10 normalization constants
     CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
@@ -302,13 +147,8 @@ def train():
             # Forward pass
             predictions, targets, context_mask, target_mask = model(imgs)
             
-            # Normalize features
-            predictions = F.normalize(predictions, dim=1)
-            targets = F.normalize(targets, dim=1)
-            
             # Compute loss only on target (masked) regions
-            loss = F.smooth_l1_loss(predictions, targets, reduction='none').sum(dim=1, keepdim=True)
-            loss = loss.mul_(target_mask).sum() / (target_mask.sum() + 1e-8)
+            loss = criterion(predictions, targets, target_mask)
             
             # Backward and optimize
             loss.backward()
@@ -336,7 +176,7 @@ def train():
         
         # Validation
         if epoch % train_hypers.get('validate_epochs_freq', 5) == 0:
-            val_loss = validate(model, valid_loader, device)
+            val_loss = validate(model, valid_loader, device, criterion)
             print(f"[Val] Epoch {epoch} | Loss: {val_loss:.4f}")
             wandb.log({'val/loss': val_loss, 'epoch': epoch})
             
@@ -361,7 +201,7 @@ def train():
 
 
 @torch.no_grad()
-def validate(model, dataloader, device):
+def validate(model, dataloader, device, criterion):
     """Validation function"""
     model.eval()
     total_loss = 0
@@ -375,13 +215,8 @@ def validate(model, dataloader, device):
         # Forward pass
         predictions, targets, context_mask, target_mask = model(imgs)
         
-        # Normalize features
-        predictions = F.normalize(predictions, dim=1)
-        targets = F.normalize(targets, dim=1)
-        
         # Compute loss
-        loss = F.smooth_l1_loss(predictions, targets, reduction='none').sum(dim=1, keepdim=True)
-        loss = loss.mul_(target_mask).sum() / (target_mask.sum() + 1e-8)
+        loss = criterion(predictions, targets, target_mask)
         
         total_loss += loss.item() * batch_size
         total_samples += batch_size

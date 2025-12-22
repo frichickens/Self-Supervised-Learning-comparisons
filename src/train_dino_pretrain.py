@@ -16,7 +16,7 @@ from model.resnet_DINO import ResNet18_DINO, ResNet34_DINO
 from data.dino_data import get_dino_dataloader
 from utils.utils import save_checkpoint, load_checkpoint, get_timestamp
 
-
+load_dotenv()
 
 def cosine_scheduler(base_value, final_value, epochs, niter_per_ep, 
                      warmup_epochs=0, start_warmup_value=0):
