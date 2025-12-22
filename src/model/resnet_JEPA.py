@@ -47,7 +47,8 @@ ResNet.forward = forward
 @torch.no_grad()
 def convnet_test():
     from timm.models import create_model
-    cnn = create_model('resnet50')
+    cnn = create_model('resnet34')
+    print(cnn)
     print('get_downsample_ratio:', cnn.get_downsample_ratio())
     print('get_feature_map_channels:', cnn.get_feature_map_channels())
     
