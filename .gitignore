@@ -1,3 +1,5 @@
 checkpoints
 datasets
 src/wandb
+
+.env
