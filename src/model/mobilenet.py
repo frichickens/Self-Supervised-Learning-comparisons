@@ -47,8 +47,8 @@ class MobileNetV1(nn.Module):
             conv_dw(1024, 1024, 1),          #                →  2×2×1024
         )
 
-        self.classifier = nn.Linear(1024, c_out)
         self.pool = nn.AdaptiveAvgPool2d(1)   # Works on any size → 1×1
+        self.classifier = nn.Linear(1024, c_out)
 
     def forward(self, x):
         x = self.model(x)

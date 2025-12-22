@@ -1,5 +1,7 @@
 from .mobilenet import MobileNetV1
 from .resnet import *
+from .mobilenet_DINO import *
+from .resnet_DINO import *
 
 def create_model(opt):
     if opt['model'] == 'mobilenet':

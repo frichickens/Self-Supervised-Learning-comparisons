@@ -1,2 +1,1 @@
-python train.py \
-    -opt options/mobilenet.yml \
+python train.py -opt options/mobilenet.yml 
