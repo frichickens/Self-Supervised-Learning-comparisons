@@ -2,8 +2,8 @@ name: finetune_jepa_resnet18_cifar10
 seed: 42
 
 # Path to pretrained I-JEPA checkpoint
-pretrain_path: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/checkpoints/jepa_resnet18_cifar10_best.pth
-checkpoint_path: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/checkpoints
+pretrain_path: checkpoints/jepa_resnet18_cifar10_best.pth
+checkpoint_path: /checkpoints
 
 # Model configuration
 backbone:

@@ -2,7 +2,7 @@ model: resnet18
 seed: 42
 
 pretrain_path: ""
-checkpoint_path: /mnt/disk4/baodq/comparision_ssl/checkpoints
+checkpoint_path: /checkpoints
 
 out_nc: 10 # number of classes CIFAR10
 is_train: true

@@ -1,0 +1,63 @@
+# DINO pretraining configuration for ResNet18
+model:
+  name: "resnet18_dino"
+  architecture: "resnet18"
+  backbone: {}  
+  head:
+    out_dim: 65536
+    use_bn_in_head: false
+    norm_last_layer: true
+    hidden_dim: 2048
+    bottleneck_dim: 256
+    nlayers: 3
+  momentum_teacher: 0.996
+
+training:
+  method: "dino"
+  epochs: 50
+  batch_size: 96
+  num_workers: 4
+  eval_batch_size: 256
+  
+  # Multi-crop settings for STL-10 
+  n_local_crops: 8
+  global_crop_size: 96
+  local_crop_size: 48
+  global_crops_scale: [0.4, 1.0]
+  local_crops_scale: [0.05, 0.4]
+  
+  # Optimizer settings
+  optimizer: "adamw"
+  base_lr: 0.01
+  weight_decay: 0.04
+  warmup_epochs: 5
+  
+  # Loss settings
+  student_temp: 0.1
+  teacher_temp: 0.04
+  warmup_teacher_temp: 0.04
+  warmup_teacher_temp_epochs: 30
+  center_momentum: 0.9
+  
+  # Momentum schedule for teacher
+  momentum_teacher_start: 0.996
+  momentum_teacher_end: 1.0
+  
+  # Training settings
+  use_amp: true
+  gradient_clip: 3.0
+  seed: 42
+
+data:
+  dataset: "stl10"
+  data_dir: "./datasets"
+
+logging:
+  use_wandb: true
+  project_name: "ssl-dino"
+  save_freq: 50
+  log_freq: 10
+
+paths:
+  checkpoint_dir: "./checkpoints/dino"
+  log_dir: "./logs/dino"

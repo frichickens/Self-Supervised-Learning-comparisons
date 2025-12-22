@@ -3,7 +3,7 @@ seed: 42
 
 # Pretraining mode
 pretrain_path: ""
-checkpoint_path: /mnt/disk1/huync/Self-Supervised-Learning-comparisons/checkpoints
+checkpoint_path: /checkpoints
 
 # Model configuration
 backbone:
