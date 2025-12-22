@@ -1,1 +1,0 @@
-python train_dino_pretrain.py -opt options/resnet18_dino.yml

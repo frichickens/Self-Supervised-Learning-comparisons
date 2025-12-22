@@ -10,9 +10,10 @@ import numpy as np
 from dotenv import load_dotenv
 
 import options.options as option
-from model.mobilenet_DINO import MobileNet_DINO, DINOLoss
+from model.mobilenet_DINO import MobileNet_DINO
+from utils.dino_utils import DINOLoss
 from model.resnet_DINO import ResNet18_DINO, ResNet34_DINO
-from data.dino_augmentation import get_dino_dataloader
+from data.dino_data import get_dino_dataloader
 from utils.utils import save_checkpoint, load_checkpoint, get_timestamp
 
 
@@ -137,7 +138,7 @@ def train_one_epoch(model, criterion, dataloader, optimizer, scaler,
     avg_teacher_std = np.mean(teacher_stds)
     
     if avg_student_std < 0.01 or avg_teacher_std < 0.01:
-        print(f"\n⚠️ WARNING: Potential collapse detected!")
+        print(f"\nPotential collapse detected!")
         print(f"Student std: {avg_student_std:.4f}, Teacher std: {avg_teacher_std:.4f}")
     
     return total_loss / len(dataloader), avg_student_std, avg_teacher_std
@@ -314,12 +315,12 @@ def main(opt):
                 f"dino_{arch}_epoch{epoch + 1}.pth"
             )
             save_checkpoint(model, checkpoint_path)
-            print(f"  ✓ Checkpoint saved: {checkpoint_path}")
+            print(f"Checkpoint saved: {checkpoint_path}")
     
     # Save final model
     final_path = os.path.join(opt['paths']['checkpoint_dir'], f"dino_{arch}_final.pth")
     save_checkpoint(model, final_path)
-    print(f"\n✓ Final model saved: {final_path}")
+    print(f"\nFinal model saved: {final_path}")
     
     if opt['logging']['use_wandb']:
         wandb.finish()

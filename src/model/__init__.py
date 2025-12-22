@@ -10,9 +10,5 @@ def create_model(opt):
         return ResNet18(c_out=opt['out_nc'])
     elif opt['model'] == 'resnet34':
         return ResNet34(c_out=opt['out_nc'])
-    elif opt['model'] == 'resnet18_dino':
-        return ResNet18_DINO(c_out=opt['out_nc'])
-    elif opt['model'] == 'resnet34_dino':
-        return ResNet34_DINO(c_out=opt['out_nc'])
     else:
         raise NotImplementedError('Model [{:s}] is not recognized.'.format(opt['model']))

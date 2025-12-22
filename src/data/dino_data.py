@@ -115,22 +115,19 @@ def get_dino_dataloader(config):
     n_local_crops = config['training']['n_local_crops']
     data_dir = config['data'].get('data_dir', './data')
     
-    # Load base dataset (without transforms - we'll apply DINO transforms)
     if dataset_name == 'cifar10':
-        # Use torchvision CIFAR10 directly with no transforms
         base_dataset = CIFAR10(
             root=data_dir,
             train=True,
             download=True,
-            transform=None  # We'll apply DINO transforms in DINODataset
+            transform=None,
         )
     elif dataset_name == 'stl10':
-        # Use torchvision STL10 directly with no transforms
         base_dataset = STL10(
             root=data_dir,
             split='train+unlabeled',  # Use both labeled and unlabeled for pretraining
             download=True,
-            transform=None
+            transform=None,
         )
     else:
         raise ValueError(f"Unknown dataset: {dataset_name}")
@@ -140,7 +137,6 @@ def get_dino_dataloader(config):
     # Wrap with DINO augmentation
     dino_dataset = DINODataset(base_dataset, config)
     
-    # Custom collate function to stack multi-crop batches
     def collate_fn(batch):
         """
         Collate function for multi-crop batches.
@@ -154,7 +150,6 @@ def get_dino_dataloader(config):
         n_crops = 2 + n_local_crops
         return [torch.stack([crops[i] for crops in batch]) for i in range(n_crops)]
     
-    # Create dataloader
     dataloader = torch.utils.data.DataLoader(
         dino_dataset,
         batch_size=batch_size,

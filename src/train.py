@@ -11,7 +11,10 @@ import argparse
 from dotenv import load_dotenv
 # from huggingface_hub import login
 from utils.utils import *
+from utils.dino_utils import *
 from tqdm import tqdm
+
+from model.projector import Projector
 
 
 parser = argparse.ArgumentParser()
@@ -20,19 +23,30 @@ parser.add_argument('-root', type=str, default=None, choices=['.'])
 args = parser.parse_args()
 opt = option.parse(args.opt, root=args.root)
 opt = option.dict_to_nonedict(opt)
-model = create_model(opt)
+
 train_set, train_loader, valid_set, valid_loader, test_set, test_loader = create_ds(opt)
 
+# 'jepa' or 'dino' or 'scratch'
+if 'jepa' or 'dino' in opt['model']:
+    model = Projector(
+        pretrained_path=opt['pretrain_path'],
+        out_dim=opt['out_nc'],
+        name=opt['model']
+    )
+else:
+    model = create_model(opt)
+    model = load_checkpoint(model, opt['pretrain_path'])
 
 train_hypers = opt['hyperparameters']
-checkpoint_path = opt['checkpoint_path']
+checkpoint_path = opt['save_checkpoint_path']
+os.makedirs(checkpoint_path, exist_ok=True)
 
 loss_func = nn.CrossEntropyLoss()
 optimizer = create_optimizer(model.parameters(), train_hypers)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, train_hypers['epochs'], train_hypers['eta_min'])
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-model = load_checkpoint(model, opt['pretrain_path'])
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+
 model.to(device)
 
 
@@ -187,7 +201,8 @@ if __name__ == '__main__':
     wandb.config.weight_decay = opt['hyperparameters']['weight_decay']
     wandb.config.seed = opt['hyperparameters']['seed']
 
-        
+    print("Starting training ...")
+    
     if opt['is_train']:
         train()
     if opt['is_test']:

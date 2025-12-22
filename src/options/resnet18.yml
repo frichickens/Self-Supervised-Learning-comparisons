@@ -2,7 +2,7 @@ model: resnet18
 seed: 42
 
 pretrain_path: ""
-checkpoint_path: /checkpoints
+save_checkpoint_path: ./checkpoints/vanila/resnet18_cifar10
 
 out_nc: 10 # number of classes CIFAR10
 is_train: true

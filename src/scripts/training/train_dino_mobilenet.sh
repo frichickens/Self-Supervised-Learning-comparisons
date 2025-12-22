@@ -1,1 +1,0 @@
-python train_dino_pretrain.py -opt options/mobilenet_dino.yml
