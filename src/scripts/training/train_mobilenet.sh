@@ -1,2 +1,2 @@
-python train.py \
-    -opt options/mobilenet.yml \
+python src/train.py \
+    -opt src/options/mobilenet.yml \

@@ -1,2 +1,2 @@
-python train.py \
-    -opt options/resnet34.yml \
+python src/train.py \
+    -opt src/options/resnet34.yml \
