@@ -1,4 +1,3 @@
-
 import copy
 import pytorch_lightning as pl
 import torch
@@ -173,6 +172,10 @@ class DINO(pl.LightningModule):
         teacher_out = [self.forward_teacher(view) for view in global_views]
         student_out = [self.forward(view) for view in views]
         loss = self.criterion(teacher_out, student_out, epoch=self.current_epoch)
+        
+        # Log loss to wandb
+        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        
         return loss
 
     def on_after_backward(self):
@@ -211,7 +214,7 @@ test_dataset_knn = torchvision.datasets.CIFAR10(
 # CHANGE
 wandb_logger = WandbLogger(
     project="SSL_Comp",  # Change to your project name
-    name="dino-resnet18-run",  # Change to your run name
+    name="dino-resnet18-knn-run",  # Change to your run name
     log_model=False,
 )
 
@@ -273,8 +276,7 @@ trainer = pl.Trainer(
     accelerator=accelerator,
     log_every_n_steps=10,
     logger=wandb_logger,
-    # callbacks=[checkpoint_callback, knn_callback],
-    callbacks=[checkpoint_callback],
+    callbacks=[checkpoint_callback, knn_callback],
 )
 
 trainer.fit(model=model, train_dataloaders=train_loader_dino)
