@@ -44,4 +44,5 @@ bash ...script in scripts...
 ```
 Cifar-10: https://www.kaggle.com/datasets/quocbaohust/cifar10
 Cifar-100: 
+stl10: 
 ```
