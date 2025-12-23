@@ -14,8 +14,8 @@ model:
 
 training:
   method: "dino"
-  epochs: 100
-  batch_size: 128 
+  epochs: 50
+  batch_size: 32 
   num_workers: 4
   eval_batch_size: 256
   

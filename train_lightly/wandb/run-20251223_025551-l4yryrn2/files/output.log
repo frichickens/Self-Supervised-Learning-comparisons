@@ -1,0 +1,18 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name            | Type                 | Params | Mode  | FLOPs
+-------------------------------------------------------------------------
+0 | backbone        | Sequential           | 11.2 M | train | 0
+1 | projection_head | SimCLRProjectionHead | 5.3 M  | train | 0
+2 | criterion       | NTXentLoss           | 0      | train | 0
+-------------------------------------------------------------------------
+16.4 M    Trainable params
+0         Non-trainable params
+16.4 M    Total params
+65.710    Total estimated model params size (MB)
+77        Modules in train mode
+0         Modules in eval mode
+0         Total Flops
+Epoch 128:  18%|████████████████████▊                                                                                            | 36/195 [00:02<00:10, 14.84it/s, v_num=yrn2]
+
+Detected KeyboardInterrupt, attempting graceful shutdown ...

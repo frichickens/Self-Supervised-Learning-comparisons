@@ -1,0 +1,20 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name                     | Type                     | Params | Mode  | FLOPs
+--------------------------------------------------------------------------------------
+0 | backbone                 | Sequential               | 11.2 M | train | 0
+1 | projection_head          | BYOLProjectionHead       | 788 K  | train | 0
+2 | prediction_head          | BYOLPredictionHead       | 526 K  | train | 0
+3 | backbone_momentum        | Sequential               | 11.2 M | train | 0
+4 | projection_head_momentum | BYOLProjectionHead       | 788 K  | train | 0
+5 | criterion                | NegativeCosineSimilarity | 0      | train | 0
+--------------------------------------------------------------------------------------
+12.5 M    Trainable params
+12.0 M    Non-trainable params
+24.5 M    Total params
+97.828    Total estimated model params size (MB)
+153       Modules in train mode
+0         Modules in eval mode
+0         Total Flops
+Epoch 2: 100%|█████████████████████████████████████████████████████████████████| 195/195 [00:08<00:00, 21.83it/s, v_num=mmxb, train_loss_step=-0.605, train_loss_epoch=-0.601]
+`Trainer.fit` stopped: `max_epochs=3` reached.

@@ -1,0 +1,77 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name                     | Type                     | Params | Mode  | FLOPs
+--------------------------------------------------------------------------------------
+0 | backbone                 | Sequential               | 11.2 M | train | 0
+1 | projection_head          | BYOLProjectionHead       | 788 K  | train | 0
+2 | prediction_head          | BYOLPredictionHead       | 526 K  | train | 0
+3 | backbone_momentum        | Sequential               | 11.2 M | train | 0
+4 | projection_head_momentum | BYOLProjectionHead       | 788 K  | train | 0
+5 | criterion                | NegativeCosineSimilarity | 0      | train | 0
+--------------------------------------------------------------------------------------
+12.5 M    Trainable params
+12.0 M    Non-trainable params
+24.5 M    Total params
+97.828    Total estimated model params size (MB)
+153       Modules in train mode
+0         Modules in eval mode
+0         Total Flops
+Epoch 26:   0%|                                                                          | 0/195 [00:00<?, ?it/s, v_num=pn5l, train_loss_step=-0.651, train_loss_epoch=-0.632]
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 11 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 12 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 13 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 14 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 15 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 16 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 17 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 18 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 19 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 20 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 21 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 22 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 23 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 24 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 25 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 26 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 27 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 28 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 29 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 30 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 31 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 32 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 33 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 34 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 35 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 36 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 37 exceeds max_steps 10.
+  warnings.warn(
+/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/lightly/utils/scheduler.py:40: RuntimeWarning: Current step number 38 exceeds max_steps 10.
+  warnings.warn(
+
+Detected KeyboardInterrupt, attempting graceful shutdown ...

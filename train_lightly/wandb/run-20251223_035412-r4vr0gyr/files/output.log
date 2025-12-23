@@ -1,0 +1,20 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name             | Type               | Params | Mode  | FLOPs
+------------------------------------------------------------------------
+0 | student_backbone | Sequential         | 11.2 M | train | 0
+1 | student_head     | DINOProjectionHead | 691 K  | train | 0
+2 | teacher_backbone | Sequential         | 11.2 M | train | 0
+3 | teacher_head     | DINOProjectionHead | 691 K  | train | 0
+4 | criterion        | DINOLoss           | 0      | train | 0
+------------------------------------------------------------------------
+11.9 M    Trainable params
+11.9 M    Non-trainable params
+23.7 M    Total params
+94.942    Total estimated model params size (MB)
+151       Modules in train mode
+0         Modules in eval mode
+0         Total Flops
+Epoch 0:   0%|                                                                                                                                        | 0/195 [00:00<?, ?it/s]
+
+Detected KeyboardInterrupt, attempting graceful shutdown ...

@@ -1,0 +1,457 @@
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_setup.py:_flush():80] Current SDK version is 0.23.1
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_setup.py:_flush():80] Configure stats pid to 2670529
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_setup.py:_flush():80] Loading settings from /home/vaipe/.config/wandb/settings
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_setup.py:_flush():80] Loading settings from /mnt/disk4/baodq/Self-Supervised-Learning-comparisons/wandb/settings
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_setup.py:_flush():80] Loading settings from environment variables
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_init.py:setup_run_log_directory():714] Logging user logs to wandb/run-20251223_015956-k0fdurbs/logs/debug.log
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_init.py:setup_run_log_directory():715] Logging internal logs to wandb/run-20251223_015956-k0fdurbs/logs/debug-internal.log
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_init.py:init():841] calling init triggers
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_init.py:init():846] wandb.init called with sweep_config: {}
+config: {'_wandb': {}}
+2025-12-23 01:59:56,677 INFO    MainThread:2670529 [wandb_init.py:init():889] starting backend
+2025-12-23 01:59:56,891 INFO    MainThread:2670529 [wandb_init.py:init():892] sending inform_init request
+2025-12-23 01:59:56,893 INFO    MainThread:2670529 [wandb_init.py:init():900] backend started and connected
+2025-12-23 01:59:56,894 INFO    MainThread:2670529 [wandb_init.py:init():970] updated telemetry
+2025-12-23 01:59:56,897 INFO    MainThread:2670529 [wandb_init.py:init():994] communicating run to backend with 90.0 second timeout
+2025-12-23 01:59:57,938 INFO    MainThread:2670529 [wandb_init.py:init():1041] starting run threads in backend
+2025-12-23 01:59:57,967 INFO    MainThread:2670529 [wandb_run.py:_console_start():2521] atexit reg
+2025-12-23 01:59:57,967 INFO    MainThread:2670529 [wandb_run.py:_redirect():2369] redirect: wrap_raw
+2025-12-23 01:59:57,967 INFO    MainThread:2670529 [wandb_run.py:_redirect():2438] Wrapping output streams.
+2025-12-23 01:59:57,967 INFO    MainThread:2670529 [wandb_run.py:_redirect():2461] Redirects installed.
+2025-12-23 01:59:57,969 INFO    MainThread:2670529 [wandb_init.py:init():1081] run started, returning control to user process
+2025-12-23 02:02:15,374 INFO    wandb-AsyncioManager-main:2670529 [service_client.py:_forward_responses():80] Reached EOF.
+2025-12-23 02:02:15,382 INFO    wandb-AsyncioManager-main:2670529 [mailbox.py:close():137] Closing mailbox, abandoning 1 handles.
+2025-12-23 02:02:15,651 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,659 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,659 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,660 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,660 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,660 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,661 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,665 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,665 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,666 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,666 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,667 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,667 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,669 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,669 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,669 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,669 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,669 ERROR   wandb-AsyncioManager-main:2670529 [asyncio_manager.py:fn_wrap_exceptions():183] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/asyncio_manager.py", line 181, in fn_wrap_exceptions
+    await fn()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 38, in publish
+    await self._send_server_request(request)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/service/service_client.py", line 64, in _send_server_request
+    await self._writer.drain()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 371, in drain
+    await self._protocol._drain_helper()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/asyncio/streams.py", line 167, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2025-12-23 02:02:15,887 ERROR   MainThread:2670529 [redirect.py:_on_write():664] [all runs] error in stdout callback
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/redirect.py", line 662, in _on_write
+    cb(written_data)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 2442, in <lambda>
+    lambda data: self._console_raw_callback("stdout", data),
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 458, in wrapper_fn
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 1601, in _console_raw_callback
+    self._backend.interface.publish_output_raw(name, data, nowait=True)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/interface/interface.py", line 789, in publish_output_raw
+    o.timestamp.GetCurrentTime()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 184, in GetCurrentTime
+    self.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 283, in FromDatetime
+    seconds = calendar.timegm(dt.utctimetuple())
+ImportError: sys.meta_path is None, Python is likely shutting down
+2025-12-23 02:02:15,895 ERROR   MainThread:2670529 [redirect.py:_on_write():664] [all runs] error in stdout callback
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/redirect.py", line 662, in _on_write
+    cb(written_data)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 2442, in <lambda>
+    lambda data: self._console_raw_callback("stdout", data),
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 458, in wrapper_fn
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 1601, in _console_raw_callback
+    self._backend.interface.publish_output_raw(name, data, nowait=True)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/interface/interface.py", line 789, in publish_output_raw
+    o.timestamp.GetCurrentTime()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 184, in GetCurrentTime
+    self.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 283, in FromDatetime
+    seconds = calendar.timegm(dt.utctimetuple())
+ImportError: sys.meta_path is None, Python is likely shutting down
+2025-12-23 02:02:15,895 ERROR   MainThread:2670529 [redirect.py:_on_write():664] [all runs] error in stdout callback
+Traceback (most recent call last):
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/lib/redirect.py", line 662, in _on_write
+    cb(written_data)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 2442, in <lambda>
+    lambda data: self._console_raw_callback("stdout", data),
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 400, in wrapper
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 458, in wrapper_fn
+    return func(self, *args, **kwargs)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/wandb_run.py", line 1601, in _console_raw_callback
+    self._backend.interface.publish_output_raw(name, data, nowait=True)
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/wandb/sdk/interface/interface.py", line 789, in publish_output_raw
+    o.timestamp.GetCurrentTime()
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 184, in GetCurrentTime
+    self.FromDatetime(datetime.datetime.now(tz=datetime.timezone.utc))
+  File "/mnt/disk1/miniconda3/envs/baodq_ssl/lib/python3.10/site-packages/google/protobuf/internal/well_known_types.py", line 283, in FromDatetime
+    seconds = calendar.timegm(dt.utctimetuple())
+ImportError: sys.meta_path is None, Python is likely shutting down

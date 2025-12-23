@@ -1,0 +1,40 @@
+{
+  "os":  "Linux-5.15.0-139-generic-x86_64-with-glibc2.31",
+  "python":  "CPython 3.10.14",
+  "startedAt":  "2025-12-22T20:47:46.434061Z",
+  "program":  "/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly/model/downstream_projector.py",
+  "codePath":  "train_lightly/model/downstream_projector.py",
+  "codePathLocal":  "model/downstream_projector.py",
+  "git":  {
+    "remote":  "https://github.com/frichickens/Self-Supervised-Learning-comparisons.git/",
+    "commit":  "dd29cf4d53e813d63c8ec4bcd037c0b90ee2e10e"
+  },
+  "email":  "hang.phungthu01@gmail.com",
+  "root":  "/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly",
+  "host":  "vaipe-Z790-UD-AX",
+  "executable":  "/mnt/disk1/miniconda3/envs/baodq_ssl/bin/python",
+  "cpu_count":  24,
+  "cpu_count_logical":  32,
+  "gpu":  "NVIDIA GeForce RTX 4090",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "502392610816",
+      "used":  "421411405824"
+    }
+  },
+  "memory":  {
+    "total":  "67163844608"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4090",
+      "memoryTotal":  "25757220864",
+      "cudaCores":  16384,
+      "architecture":  "Ada",
+      "uuid":  "GPU-131c9a56-60f2-3bb0-7b04-575a2e52bd15"
+    }
+  ],
+  "cudaVersion":  "12.2",
+  "writerId":  "dqf5xbk1kxiye1tdpg3y6adernywxsop"
+}
