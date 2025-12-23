@@ -132,7 +132,7 @@ normalize_transform = torchvision.transforms.Normalize(
 test_transforms = torchvision.transforms.Compose(
     [
         torchvision.transforms.Resize(input_size),
-        torchvision. transforms.CenterCrop(128),
+        torchvision.transforms.CenterCrop(128),
         torchvision.transforms. ToTensor(),
         normalize_transform,
     ]

@@ -75,26 +75,13 @@ from torchvision.models.vision_transformer import VisionTransformer
 
 from lightly.data import LightlyDataset
 from lightly.loss import (
-    BarlowTwinsLoss,
-    DCLLoss,
-    DCLWLoss,
     DINOLoss,
-    MSNLoss,
     NegativeCosineSimilarity,
     NTXentLoss,
-    PMSNLoss,
-    SwaVLoss,
-    TiCoLoss,
-    VICRegLLoss,
-    VICRegLoss,
 )
 from lightly.models import modules, utils
 from lightly.models.modules import (
-    MAEDecoderTIMM,
-    MaskedVisionTransformerTIMM,
-    MaskedVisionTransformerTorchvision,
     heads,
-    memory_bank,
 )
 from lightly.transforms import (
     BYOLTransform,
