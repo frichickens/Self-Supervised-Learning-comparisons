@@ -1,7 +1,6 @@
 checkpoints
 datasets
 src/wandb
-.env
 src/test.py
 __pycache__/
 wandb/
