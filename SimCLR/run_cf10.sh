@@ -1,0 +1,1 @@
+python simclr_cf10.py backbone=resnet18

@@ -5,3 +5,8 @@ src/wandb
 src/test.py
 __pycache__/
 wandb/
+
+SimCLR/data
+SimCLR/logs
+train_lightly/benchmark_logs
+train_lightly/datasets

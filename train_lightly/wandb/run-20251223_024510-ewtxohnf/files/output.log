@@ -1,5 +1,0 @@
-Starting linear evaluation...
-Traceback (most recent call last):
-  File "/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly/model/downstream_projector.py", line 229, in <module>
-    print(f"Epoch [{epoch+1:3d}/{num_epochs}] | "
-ValueError: Format specifier missing precision

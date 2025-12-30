@@ -62,6 +62,7 @@ def train():
         total_preds = []
         total_gts = []
         #Training process
+        
         for batch in tqdm(train_loader, total=len(train_loader)):
             optimizer.zero_grad()
             imgs, gts = batch
