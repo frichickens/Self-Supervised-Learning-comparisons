@@ -7,6 +7,11 @@ This Github implemented:
 - BYOL
 - DINO
 
+Dependencies:
+```
+conda env create --file environment.yml 
+```
+
 Scripts to reproduce results are provided in the folder:
 ```
 Self-Supervised-Learning-comparisons/train_lightly/scripts
