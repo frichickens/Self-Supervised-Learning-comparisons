@@ -7,4 +7,7 @@ This Github implemented:
 - BYOL
 - DINO
 
-Scripts are provided inside each folder
+Scripts to reproduce results are provided in the folder:
+'''
+Self-Supervised-Learning-comparisons/train_lightly/scripts
+'''
