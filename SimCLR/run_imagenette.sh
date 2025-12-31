@@ -1,1 +1,0 @@
-python simclr_imagenette.py backbone=resnet18
