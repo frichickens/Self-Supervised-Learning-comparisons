@@ -8,6 +8,6 @@ This Github implemented:
 - DINO
 
 Scripts to reproduce results are provided in the folder:
-'''
+```
 Self-Supervised-Learning-comparisons/train_lightly/scripts
-'''
+```
