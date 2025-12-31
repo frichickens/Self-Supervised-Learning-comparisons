@@ -13,7 +13,6 @@ os.makedirs('/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly
 # Save train images
 for i, (img, label) in enumerate(trainset):
     img.save(f'/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly/datasets/cifar10/train/image_{i}.png')
-
 # Save test images
 for i, (img, label) in enumerate(testset):
     img.save(f'/mnt/disk4/baodq/Self-Supervised-Learning-comparisons/train_lightly/datasets/cifar10/test/image_{i}.png')
